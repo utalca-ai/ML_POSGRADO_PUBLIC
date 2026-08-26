@@ -1,0 +1,9 @@
+# Entorno para ejecutar los cuadernos del módulo.
+# Versiones fijadas: es el ítem 2 de la lista de cotejo de los talleres.
+#
+# Requiere Python 3.10 o superior. El Python que trae macOS es 3.9 y no sirve:
+# vea 04 Formato/README.md para montar un entorno con uv sin tocar el sistema.
+numpy==2.2.6
+scipy==1.18.1
+matplotlib==3.10.9
+scikit-learn==1.9.0

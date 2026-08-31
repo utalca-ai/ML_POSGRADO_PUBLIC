@@ -65,13 +65,75 @@ hora de clase y una de discusión.
 
 | Rol | Qué hace | Se califica |
 |----|----|----|
-| **Expositor** | Presenta el artículo en 15 min | Que identifique contribución y método sin recorrer el artículo linealmente; que respete el tiempo; que responda con argumentos |
-| **Discutidor** | Abre la discusión con una objeción **entregada por escrito antes** | Que la objeción sea sustantiva y específica de ese artículo, y que admita respuesta |
-| **El resto** | Participa desde su propia reseña, ya entregada | — |
+| **Expositor** | Presenta el artículo en 12–15 min | Que identifique la contribución y el método sin recorrer el artículo linealmente; que respete el tiempo; que responda a las objeciones con argumentos y no con autoridad |
+| **Discutidor** | Abre la discusión con una objeción **entregada por escrito antes de la sesión** | Que la objeción sea específica de ese artículo y que admita respuesta |
 
-Los turnos se sortearon en la semana 1. Cada estudiante es expositor una
-vez y discutidor una vez a lo largo del semestre; ese 5 % del módulo es
-el promedio de ambas actuaciones.
+En las semanas con dos artículos —esta, la 5, la 7 y la 13— usted toma
+los dos roles en la misma sesión: expone uno y objeta el otro. En la
+semana 11, que tiene un solo artículo, expone y el profesor abre la
+discusión. Ese 5 % del módulo es el promedio de todas sus actuaciones
+del semestre.
+
+Quien audita el módulo participa con los mismos roles, sin calificación.
+
+### Qué es una objeción, y qué contiene la media página
+
+Una objeción no es una crítica al artículo ni una lista de lo que le
+faltó. Es **una afirmación concreta del texto que usted sostiene que no
+queda establecida por lo que el artículo mismo ofrece**.
+
+Se califican dos cosas, y solo dos:
+
+1.  **Que sea específica de ese artículo.** Si su objeción se puede
+    copiar y pegar en la reseña de cualquier otro trabajo, no es una
+    objeción.
+2.  **Que admita respuesta.** Es decir, que usted mismo pueda decir qué
+    tendría que mostrarse para que quede resuelta. Una objeción que nada
+    podría responder no abre la discusión: la cierra.
+
+La entrega es de **media página**, en cuatro partes. Una o dos frases
+cada una, salvo la segunda.
+
+| \# | Parte | Qué va ahí |
+|----|----|----|
+| 1 | **La afirmación que objeta** | Citada o parafraseada con precisión, con la sección o el teorema donde aparece. Se objeta una afirmación, no un artículo. |
+| 2 | **Por qué no queda establecida** | O bajo qué condición deja de estarlo. La razón sale del material del propio artículo —su evidencia, su alcance declarado, sus supuestos—, no de una opinión externa ni de lo que usted habría hecho en su lugar. |
+| 3 | **Qué la resolvería** | Un resultado, un dato, un supuesto verificado. Es la parte que hace que la objeción admita respuesta, y la que casi siempre falta. |
+| 4 | **La pregunta con la que abre** | Una sola, dirigida al expositor. |
+
+#### Un ejemplo, sobre un artículo hipotético
+
+Suponga un artículo que concluye que el método A supera al método B
+porque obtiene mejor promedio en 12 conjuntos de datos.
+
+> **Objeción que no sirve.** «El artículo no valida suficientemente sus
+> resultados.»
+
+Sirve para cualquier artículo, y por eso no dice nada de este.
+
+> **La misma intuición, convertida en objeción.** «Los autores concluyen
+> la superioridad de A a partir de la media sobre 12 conjuntos, pero no
+> reportan la dispersión entre repeticiones ni corrigen por
+> comparaciones múltiples. Con 12 conjuntos y una diferencia de esa
+> magnitud, el resultado es compatible con la variabilidad de las
+> particiones. La objeción quedaría resuelta si mostraran el resultado
+> por conjunto con su variabilidad, o una prueba de rangos con signo.
+> ¿Sobre qué base descartan que la diferencia sea ruido de partición?»
+
+Es específica, se sostiene en lo que el artículo reporta y dice qué la
+resolvería. Eso es lo que se evalúa.
+
+### El criterio de juicio metodológico, esta semana
+
+La rúbrica de reseña pide evaluar el protocolo experimental:
+particiones, fuga de información, variabilidad reportada. Wolpert es un
+teorema y Domingos un ensayo, y ninguno de los dos tiene protocolo
+experimental que juzgar.
+
+Esta semana el criterio se lee, entonces, como **qué tipo de argumento
+es y qué evidencia lo sostiene: dónde termina lo demostrado y dónde
+empieza lo sugerido**. Desde la reseña 3 —Kapoor y Narayanan, en la
+semana 7— el criterio aplica en su sentido literal.
 
 ## 4. Notación y definiciones
 

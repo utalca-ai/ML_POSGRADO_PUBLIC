@@ -152,11 +152,49 @@ $$\mathbb{E}\bigl[(y-\hat h_S(x_0))^2\bigr]=
 desarrolle. El término cruzado se anula porque
 $\mathbb{E}_S[\hat h_S(x_0)-\bar h(x_0)]=0$ por definición de $\bar h$.
 
-**Dimensión VC.** El mayor $d$ tal que existen $d$ puntos que
-$\mathcal{H}$ puede etiquetar de las $2^d$ formas posibles. Rectas en el
-plano: $d_{VC}=3$. Hiperplanos en $\mathbb{R}^p$: $d_{VC}=p+1$.
-$h(x)=\operatorname{signo}(\sin(\alpha x))$ con un solo parámetro:
-$d_{VC}=\infty$.
+*Qué varía en esa esperanza.* $\mathbb{E}_S$ promedia sobre **muestras
+de entrenamiento**, y sobre nada más. Quedan fijos la familia
+$\mathcal{H}$, el algoritmo de ajuste, el tamaño $n$ y el punto $x_0$;
+lo único que cambia son los datos con los que se ajusta, y por
+consecuencia los coeficientes y la predicción en $x_0$. Conviene no
+confundir $\mathcal{H}$ —la familia, una sola— con
+$\hat h_{S_1}, \hat h_{S_2}, \ldots$, que son muchas hipótesis **dentro
+de esa misma familia**. El subíndice $S$ es la marca de que el modelo es
+función de la muestra, y por lo tanto una variable aleatoria.
+
+**Dimensión VC.** Antes de la definición, el supuesto que la hace
+legible: aquí $h$ **clasifica**. Es una función discriminante —en el
+caso lineal, $h(x)=\operatorname{signo}(w^\top x + b)$— y la recta que
+la representa es la **frontera de decisión**: parte el plano en dos
+mitades y asigna una etiqueta a cada lado. **No pasa por los puntos, los
+separa.** Leída como si la recta ajustara los datos, la definición que
+sigue no tiene sentido.
+
+Se dice que $\mathcal{H}$ **pulveriza** un conjunto de $d$ puntos si,
+para cada una de las $2^d$ maneras de etiquetarlos, existe algún
+$h\in\mathcal{H}$ que la reproduce. La **dimensión VC** es el mayor $d$
+tal que existe **algún** conjunto de $d$ puntos que $\mathcal{H}$
+pulveriza.
+
+En esa asimetría está el contenido: **mejor caso sobre la elección de
+los puntos, peor caso sobre las etiquetaciones.** Basta con que funcione
+una configuración, pero en ella tienen que salir todas las
+etiquetaciones.
+
+*Rectas en el plano:* $d_{VC}=3$. Tres puntos en triángulo se pulverizan
+—las dos etiquetaciones de «todos iguales» se consiguen dejando el
+triángulo entero de un lado, y las seis restantes cortando un vértice—.
+Tres puntos **colineales** no se pulverizan: la etiquetación $+,-,+$ es
+imposible, porque una recta que deje los extremos del mismo lado deja
+también todo lo que hay entre ellos. Eso no baja la dimensión a 2,
+porque basta el triángulo. Con cuatro puntos, en cambio, no sobrevive
+ninguna configuración: en posición convexa falla el caso de las
+diagonales opuestas —el XOR— y, si uno queda dentro del triángulo de los
+otros tres, falla separar el interior de los vértices.
+
+*Otros casos:* hiperplanos en $\mathbb{R}^p$, $d_{VC}=p+1$. Y
+$h(x)=\operatorname{signo}(\sin(\alpha x))$, con un solo parámetro,
+$d_{VC}=\infty$: la razón de que contar parámetros no mida la capacidad.
 
 **Cota de generalización.** Con probabilidad $\geq 1-\delta$, para toda
 $h\in\mathcal{H}$ simultáneamente:
@@ -166,6 +204,64 @@ $$R_{\mathcal{D}}(h)\;\leq\;R_S(h)\;+\;\sqrt{\frac{d_{VC}\bigl(\log\frac{2n}{d_{
 La palabra decisiva es **«para toda $h$ simultáneamente»**: por eso la
 cota sobrevive al hecho de que el entrenamiento elige $h$ mirando la
 muestra.
+
+**Márgenes, o por qué el SVM funciona igual.** La objeción natural es el
+kernel. Si el problema no es linealmente separable se pasa a un espacio
+de características donde sí lo es —agregar $x_1x_2$ como tercera
+coordenada ya resuelve el XOR— y la frontera, vista de vuelta en el
+plano original, es una curva. Eso no contradice que $d_{VC}=3$: esa
+cifra era de las rectas, y usted cambió de familia. Las cónicas en el
+plano tienen $d_{VC}=6$, y el cambio se paga en varianza.
+
+El caso interesante es el kernel gaussiano, cuyo espacio de
+características es de dimensión infinita: $d_{VC}=\infty$ y la cota de
+arriba queda **vacía**, no dice nada. Y sin embargo el método funciona.
+La resolución es que existe otra cota, en la que la capacidad efectiva
+no depende de la dimensión sino del **margen**: si los datos caben en
+una bola de radio $R$ y el separador deja un margen $\gamma$, esa
+capacidad se acota por $R^2/\gamma^2$, sin que la dimensión aparezca por
+ninguna parte. Maximizar el margen —y el parámetro $C$, que lo negocia
+contra los errores— **es** el control de capacidad. Es la misma moraleja
+un escalón más arriba: la capacidad no es el número de parámetros, y
+tampoco es la dimensión del espacio de características.
+
+Y un cierre con el seminario del mismo día: elegir el kernel *es* elegir
+el sesgo inductivo, es decir, comprometerse con una priori. No hay
+almuerzo gratis en esa elección; el gaussiano funciona porque la
+suavidad que supone resulta ser cierta en los problemas que solemos
+encontrar.
+
+### Dos ejes que se confunden
+
+La varianza no se mide en el conjunto de validación. Se mide sobre los
+datos con los que usted **entrenó**.
+
+| La pregunta | El eje que define |
+|----|----|
+| ¿Con qué datos ajusté el modelo? | El de la **varianza**: si repitiera el estudio con otra muestra de la misma población, ¿me saldría el mismo modelo? |
+| ¿En qué datos lo evalúo? | El del **error de prueba**, que estima la suma de los tres términos, no la varianza sola. |
+
+La piedra de toque es el modelo lineal. Ajuste una recta a muchas
+muestras distintas del mismo fenómeno y obtendrá otras tantas rectas
+casi superpuestas: todas parecidas entre sí, y todas errándole a la
+curva verdadera de la misma manera. Eso es **varianza baja y sesgo
+alto**. Que le vaya mal en validación no lo convierte en un modelo de
+varianza alta: es un modelo consistente y equivocado. Varianza baja no
+significa «acierta», significa «no cambia de opinión».
+
+De ahí que un error de prueba alto, por sí solo, no diagnostique nada.
+La recta y el polinomio de grado 12 pueden dar un número parecido y
+necesitar remedios opuestos —más capacidad en un caso, menos en el
+otro—. Para separarlos hacen falta los dos números, y el delator es el
+error de entrenamiento: la recta falla también ahí, porque ni siquiera
+puede ajustar los datos que vio; el grado 12 los clava.
+
+Un último punto, sobre el alcance. La descomposición vive sobre el
+experimento de las muchas muestras, así que solo el cuaderno la puede
+calcular: tiene las 3000 réplicas y además conoce $f$. Con una sola
+muestra —su caso, siempre— la validación estima el error total, no su
+descomposición. De un conjunto de validación no se leen el sesgo y la
+varianza por separado.
 
 ## 5. Trabajo autónomo de la semana
 
@@ -198,18 +294,33 @@ Si dos expertos coinciden en el 85 % de los casos, un clasificador del
 
 ### 5.2 Qué mirar en el cuaderno
 
-`clase03_sesgo_varianza.ipynb` repite el estudio **300 veces** con
+`clase03_sesgo_varianza.ipynb` repite el estudio **3000 veces** con
 muestras independientes —el experimento mental de la clase, hecho de
-verdad— y mide los tres términos por separado.
+verdad— y mide los tres términos por separado. El diseño es el de Bishop
+(2006), §3.2, figura 3.5, con su mismo tamaño de muestra: 24 funciones
+base gaussianas más el sesgo, $n=25$ y ajuste por regresión de cresta.
 
-Dos resultados que conviene ver con cuidado:
+**La capacidad se recorre con $\lambda$, no con el número de
+parámetros.** El modelo tiene 25 coeficientes de principio a fin del
+barrido; lo único que cambia es cuánto los aplasta la regularización.
+Ese $\lambda$ es exactamente el de la semana 4.
+
+Tres resultados que conviene ver con cuidado:
 
 - La identidad se **verifica numéricamente**: la suma de los tres
-  términos reproduce el error total medido de forma independiente, con
-  menos de 0,15 % de discrepancia. Si no lo hiciera, el cuaderno falla.
-- En el mejor modelo, **el 83 % del error es ruido irreducible**. El
-  margen real de mejora era mucho menor de lo que sugiere el error
-  absoluto.
+  términos reproduce el error total medido de forma independiente. Si no
+  lo hiciera, el cuaderno falla ruidosamente.
+- El mínimo del error total está en $\ln\lambda = 0$: total $0{,}0784$,
+  de los cuales $0{,}0625$ son ruido. Es decir, **el 80 % del error del
+  mejor modelo es irreducible**, y el margen real de mejora era
+  $0{,}0159$ —mucho menor de lo que sugiere el error absoluto—.
+- **La curva en U aparece sin agregar un solo parámetro.** Es la
+  afirmación de la clase —que la capacidad no es el número de
+  parámetros— convertida en medición.
+
+Y una advertencia de lectura: el eje horizontal es $\ln\lambda$, de modo
+que la capacidad efectiva **disminuye hacia la derecha**. La figura está
+espejada respecto de la curva en U de la semana 1.
 
 ## 6. Lecturas
 
@@ -229,6 +340,20 @@ Dos resultados que conviene ver con cuidado:
 Cubre la descomposición y el «optimismo» del error de entrenamiento, que
 es el sesgo optimista de la semana 1 con otro nombre.
 
+> Bishop, C. M. (2006). *Pattern Recognition and Machine Learning*.
+> Springer, §1.1 y §3.2.
+
+De donde salen el ejemplo de $\operatorname{sen}(2\pi x)$ que se usa
+desde la semana 1 y el experimento del cuaderno de esta semana, incluido
+su tamaño de muestra. Consúltelo si quiere ver el original; no es
+obligatorio.
+
+> Geman, S., Bienenstock, E., & Doursat, R. (1992). Neural networks and
+> the bias/variance dilemma. *Neural Computation*, 4(1), 1–58.
+
+El artículo donde se formula el compromiso. Se cita aquí por
+procedencia, no como lectura de la semana.
+
 > Shalev-Shwartz, S., & Ben-David, S. (2014). *Understanding Machine
 > Learning*, capítulo 6.
 
@@ -243,18 +368,20 @@ parte teórica: nada de lo que se evalúa en el módulo la exige.
     parecido. ¿Sesgo o varianza? ¿Y qué hace al respecto?
 3.  Su modelo tiene error de entrenamiento casi nulo y error de prueba
     cinco veces mayor. ¿Sesgo o varianza? ¿Y qué hace?
-4.  ¿Por qué $h(x)=\operatorname{signo}(\sin(\alpha x))$, con un solo
+4.  Un modelo lineal le falla tanto en entrenamiento como en prueba. ¿Su
+    varianza es alta o baja? Justifique.
+5.  ¿Por qué $h(x)=\operatorname{signo}(\sin(\alpha x))$, con un solo
     parámetro, tiene dimensión VC infinita?
-5.  ¿Qué le garantiza una cota VC, y por qué no le sirve para reportar
+6.  ¿Qué le garantiza una cota VC, y por qué no le sirve para reportar
     el error esperado de su modelo?
-6.  ¿Cuál es el piso de ruido de su problema de tesis, y cómo lo sabe?
+7.  ¿Cuál es el piso de ruido de su problema de tesis, y cómo lo sabe?
 
 ## 8. Materiales de esta semana
 
 | Archivo | Qué es |
 |----|----|
 | `slides/clase03_sesgo_varianza.*` | Las 18 láminas de la clase |
-| `codigo/clase03_sesgo_varianza.ipynb` | Descomposición medida sobre 300 réplicas |
+| `codigo/clase03_sesgo_varianza.ipynb` | Descomposición medida sobre 3000 réplicas, barriendo $\lambda$ |
 | `guia/guia03.md` | Esta guía |
 
 ## 9. La próxima semana

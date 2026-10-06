@@ -67,6 +67,122 @@ de la primera mitad se repite: lo que parecía técnica es modelado.
 
 ## 4. Notación y definiciones
 
+### Vocabulario mínimo
+
+Cuatro términos que la clase usa constantemente. Si alguno le resulta
+nuevo, léalo aquí antes de la sesión: el resto se sigue sin dificultad.
+
+**Minimizador.** El *punto* donde una función alcanza su valor más
+pequeño, no el valor mismo. Se escribe
+$\hat\beta=\operatorname*{arg\,min}_\beta R_S(\beta)$: el $\beta$ que
+hace $R_S$ lo menor posible. $R_S(\hat\beta)$ es el mínimo —un número—;
+$\hat\beta$ es dónde se alcanza —un vector—, y es lo que interesa,
+porque es el modelo ajustado. El gorro marca siempre «estimado a partir
+de los datos».
+
+**Bernoulli.** La distribución de una variable que solo puede valer 0 o
+1: vale 1 con probabilidad $\pi$ y 0 con probabilidad $1-\pi$. Es el
+modelo de una moneda, posiblemente cargada. Su media es $\pi$ y su
+varianza $\pi(1-\pi)$ —máxima en $\pi=0{,}5$, casi nula cerca de 0 o de
+1—. No es una elección entre varias: es *la* distribución de un
+resultado binario, y por eso aparece sola en cuanto la etiqueta es
+sí/no.
+
+**Entropía cruzada.** La pérdida que cobra a cada caso $-\log$ de la
+probabilidad que el modelo asignó al resultado que efectivamente
+ocurrió. Si el modelo dio $0{,}99$ a la clase correcta, paga $0{,}01$;
+si dio $0{,}01$, paga $4{,}6$; si dio 0 y ocurrió, paga infinito. Premia
+la confianza acertada y castiga sin piedad la confianza equivocada: por
+eso empuja a calibrar probabilidades y no solo a acertar la clase. El
+nombre viene de teoría de la información —es el costo en bits de
+codificar la realidad usando la distribución predicha—, pero para este
+curso basta la lectura del precio.
+
+**Descenso de gradiente.** Procedimiento para encontrar un minimizador
+cuando no hay fórmula. Se parte de un $\beta$ cualquiera y se repite
+
+$$\beta \;\leftarrow\; \beta - \eta\,\nabla R_S(\beta)$$
+
+hasta que el error deje de bajar. El gradiente $\nabla R_S$ apunta en la
+dirección de máximo *ascenso*, así que restarlo es bajar; $\eta$, la
+tasa de aprendizaje, es el largo del paso: demasiado corto no llega en
+un tiempo razonable, demasiado largo se pasa de largo y rebota. La
+imagen útil es bajar un cerro con niebla palpando la pendiente bajo los
+pies. Cuando la función es **convexa** —forma de tazón, un solo fondo—
+se llega al mismo punto se parta de donde se parta, y por eso en
+regresión logística el error de optimización es despreciable. En redes
+profundas (semana 11) no es convexa, hay muchos fondos, y el punto de
+partida importa. En la práctica `sklearn` no usa descenso de gradiente
+puro sino métodos de segundo orden (`lbfgs`, Newton-Raphson), que
+convergen en muchas menos iteraciones con la misma idea.
+
+**ERM.** *Minimización del riesgo empírico*: quedarse con la hipótesis
+que menor error comete sobre los datos de entrenamiento, sin nada más.
+Se definió en la semana 1 y es lo que se hace por defecto. «ERM puro»
+quiere decir sin penalización añadida.
+
+**Teorema de Bayes.** La regla para dar vuelta un condicional. Si sé qué
+tan probables son los datos suponiendo unos coeficientes, me dice qué
+tan creíbles son esos coeficientes habiendo visto los datos:
+
+$$\underbrace{p(\beta\mid X,y)}_{\text{posterior}}=
+\frac{\overbrace{p(y\mid X,\beta)}^{\text{verosimilitud}}\;
+\overbrace{p(\beta)}^{\text{previa}}}{p(y\mid X)}
+\;\;\propto\;\; p(y\mid X,\beta)\,p(\beta)$$
+
+- La **previa** $p(\beta)$ es lo que usted considera creíble sobre los
+  coeficientes *antes* de mirar los datos.
+- La **verosimilitud** $p(y\mid X,\beta)$ es lo de la primera parte de
+  la clase: qué tan bien unos coeficientes dados explican lo observado.
+- La **posterior** $p(\beta\mid X,y)$ es lo que usted cree *después*.
+- El denominador $p(y\mid X)$ no depende de $\beta$, así que al buscar
+  el máximo se descarta: de ahí el $\propto$, que se lee «proporcional
+  a».
+
+**Cuidado con qué es lo incierto.** La mayoría recordará el teorema de
+Bayes aplicado a clasificar: dado un síntoma, qué enfermedad. Eso es una
+posterior sobre la **etiqueta**, y es lo que calcula la regresión
+logística cuando entrega $\Pr(y=1\mid x)$. Aquí la posterior es sobre
+los **parámetros**. Es la misma operación aplicada a otro objeto, y
+confundir ambas es el enredo más común de esta parte de la clase.
+
+**MAP.** *Máximo a posteriori*: el valor de $\beta$ donde la posterior
+alcanza su máximo. Tomando logaritmo, el producto se vuelve suma:
+
+$$\hat\beta_{\text{MAP}}=\operatorname*{arg\,max}_\beta\;
+\log p(y\mid X,\beta)+\log p(\beta)$$
+
+y como maximizar $\log p$ es minimizar $-\log p$, eso es exactamente
+«error $+\ \lambda\times$ complejidad». MAP no es hacer estadística
+bayesiana completa: un análisis bayesiano usa la posterior entera —con
+su incertidumbre—, y MAP se queda solo con su punto más alto. La
+posterior completa es la semana 14.
+
+**Distribución de Laplace.** Densidad
+$p(\beta)\propto e^{-\lvert\beta\rvert/b}$. Tiene un **pico** en cero,
+no una curva redondeada como la gaussiana, y colas más gruesas.
+Traducida a supuesto: «es muy creíble que un coeficiente valga cero, y
+también que unos pocos sean grandes». Es la misma distribución que en la
+primera parte daba el error absoluto; allí describía el ruido de $y$,
+aquí la magnitud de $\beta$.
+
+**Validación cruzada de $k$ pliegues.** Partir el conjunto de
+entrenamiento en $k$ trozos, ajustar $k$ veces dejando uno fuera cada
+vez, y promediar el error medido sobre el trozo excluido. Cada dato
+sirve de prueba exactamente una vez, y el conjunto de prueba real no se
+toca. Con $k=5$ o $k=10$ el ajuste cuesta $k$ veces más. El desarrollo
+completo —incluida la validación anidada, para cuando además se comparan
+modelos— es la semana 7.
+
+### Notación de la sesión
+
+**Vector aumentado.** $\tilde x=(1,x_1,\dots,x_p)^\top$ —«equis tilde»—
+es el vector de atributos con un 1 al frente, y
+$\beta=(\beta_0,\beta_1,\dots,\beta_p)^\top$. El 1 multiplica a
+$\beta_0$, así que $\beta^\top\tilde x=\beta_0+\sum_j\beta_j x_j$
+incluye el intercepto. Se usa en toda la sesión. Sin relación con la
+$\tilde h$ de la semana 1.
+
 **Regresión lineal.** $h_\beta(x)=\beta^\top\tilde x$, lineal **en
 $\beta$**, no necesariamente en $x$. Mínimos cuadrados ordinarios:
 
@@ -96,6 +212,18 @@ $$\hat\beta_{\text{ridge}}=\operatorname*{arg\,min}_\beta \sum_i (y_i-\beta^\top
 
 $$\hat\beta_{\text{lasso}}=\operatorname*{arg\,min}_\beta \sum_i (y_i-\beta^\top\tilde x_i)^2+\lambda\sum_j \lvert\beta_j\rvert$$
 
+**Por qué $\lambda I$ vuelve invertible la matriz.** Una matriz no tiene
+inversa cuando alguno de sus valores propios es cero. Los valores
+propios de $X^\top X$ nunca son negativos, pero valen cero justamente
+cuando hay colinealidad perfecta o $p>n$: hay una dirección del espacio
+de atributos que la matriz aplasta, y lo aplastado no se puede
+recuperar. Sumar $\lambda I$ desplaza **todos** los valores propios en
+$+\lambda$; los que valían $0$ pasan a valer $\lambda>0$ y ninguno queda
+en cero. Es la diferencia entre dividir por $0$ y dividir por
+$0+\lambda$. Ese fue el motivo original de ridge —Hoerl y Kennard
+(1970)—, antes de que se entendiera como control de capacidad; la
+demostración está en Hastie et al., §3.4.1.
+
 **Lectura bayesiana.**
 $\hat\beta_{\text{MAP}}=\operatorname*{arg\,max}_\beta \log p(y\mid X,\beta)+\log p(\beta)$.
 Previa gaussiana sobre $\beta$ da $L_2$; previa de Laplace da $L_1$. Y
@@ -105,6 +233,68 @@ dispersión que usted admite en los coeficientes.
 **Dos detalles operativos que se corrigen en el taller:** el intercepto
 **no** se penaliza, y los atributos deben estandarizarse antes —con la
 media y la desviación estimadas **solo con entrenamiento**.
+
+### Cuando el supuesto gaussiano falla: tres remedios
+
+La clase menciona tres correcciones sin desarrollarlas. Ninguna se
+evalúa en este curso, pero cada una resuelve un problema que es muy
+probable que usted tenga en su tesis, así que conviene saber que existen
+y cómo se llaman.
+
+**Mínimos cuadrados ponderados** (*weighted least squares*). Para cuando
+la varianza del error no es constante —crece con la magnitud de $y$, o
+cambia entre instrumentos o entre sitios—. Cada caso entra en la suma
+con un peso:
+
+$$\hat\beta=\operatorname*{arg\,min}_\beta \sum_i w_i\bigl(y_i-\beta^\top\tilde x_i\bigr)^2,
+\qquad w_i \propto 1/\sigma_i^2$$
+
+Los datos más ruidosos pesan menos, que es exactamente lo que dice la
+verosimilitud cuando cada $\varepsilon_i\sim N(0,\sigma_i^2)$ con
+$\sigma_i$ distinto. El problema práctico es que hay que estimar los
+$\sigma_i$; lo habitual es modelarlos en función de la predicción o de
+la variable que se sospecha responsable. *Lectura:* Faraway, **Linear
+Models with R**, el capítulo sobre problemas con el error (mínimos
+cuadrados generalizados y ponderados).
+
+**Pérdida de Huber.** Para cuando hay valores atípicos y no quiere que
+uno solo le arrastre el ajuste. Es cuadrática cerca de cero y lineal más
+allá de un umbral $\delta$:
+
+$$L_\delta(r)=\begin{cases} \tfrac{1}{2}r^2 & \lvert r\rvert\le\delta\\[2pt]
+\delta\bigl(\lvert r\rvert-\tfrac{1}{2}\delta\bigr) & \lvert r\rvert>\delta\end{cases}$$
+
+Así conserva la buena estadística del cuadrático en la zona normal y
+deja de castigar cuadráticamente los desvíos grandes: el atípico paga
+mucho, pero no lo domina todo. Es un punto intermedio entre error
+cuadrático y error absoluto, y corresponde a una verosimilitud de colas
+más pesadas que la gaussiana. *Lecturas:* Huber, P. J. (1964). Robust
+estimation of a location parameter. *Annals of Mathematical Statistics*,
+35(1), 73–101 —el artículo fundacional—; y Hastie, Tibshirani y Friedman
+(2009), la sección sobre funciones de pérdida y robustez del capítulo de
+*boosting*, que las compara gráficamente.
+
+**Modelos mixtos** (*mixed-effects models*, o multinivel). Para cuando
+los datos vienen agrupados y los errores dentro de un grupo están
+correlacionados: varias mediciones del mismo equipo, parcelas del mismo
+predio, visitas repetidas del mismo paciente, estudiantes de la misma
+sala. El modelo añade un término aleatorio propio de cada grupo $g$:
+
+$$y_{ig}=\beta^\top\tilde x_{ig}+u_g+\varepsilon_{ig},\qquad u_g\sim N(0,\tau^2)$$
+
+Ese $u_g$ es lo que hace que dos observaciones del mismo grupo se
+parezcan más entre sí que dos de grupos distintos, que es justo lo que
+la verosimilitud con errores independientes negaba. Ignorarlo no sesga
+tanto los coeficientes como los **errores estándar**: los deja demasiado
+pequeños, y con eso salen significancias que no existen. *Lecturas:*
+Gelman y Hill (2007), **Data Analysis Using Regression and
+Multilevel/Hierarchical Models** —la introducción más legible—; Bates,
+Mächler, Bolker y Walker (2015). Fitting linear mixed-effects models
+using lme4. *Journal of Statistical Software*, 67(1), 1–48 —la
+referencia de implementación—.
+
+Las tres tienen algo en común, y es el punto de la clase: no son trucos
+de ajuste, son **la verosimilitud correcta escrita correctamente**.
 
 ## 5. Trabajo autónomo de la semana
 
@@ -179,6 +369,23 @@ buenas objeciones para el rol de discutidor.
 
 > Hastie, Tibshirani y Friedman (2009), §3.4 (encogimiento) y §4.4
 > (logística).
+>
+> Hoerl, A. E. y Kennard, R. W. (1970). Ridge regression: Biased
+> estimation for nonorthogonal problems. *Technometrics*, 12(1), 55–67.
+> El artículo original, si quiere ver de dónde salió $\lambda I$.
+
+**Si el supuesto gaussiano no le sirve** — opcionales, para quien las
+necesite en su tesis. Están comentadas en la §4:
+
+> Huber, P. J. (1964). Robust estimation of a location parameter.
+> *Annals of Mathematical Statistics*, 35(1), 73–101.
+>
+> Bates, D., Mächler, M., Bolker, B. y Walker, S. (2015). Fitting linear
+> mixed-effects models using lme4. *Journal of Statistical Software*,
+> 67(1), 1–48.
+>
+> Gelman, A. y Hill, J. (2007). *Data Analysis Using Regression and
+> Multilevel/Hierarchical Models*. Cambridge University Press.
 
 ## 7. Preguntas de comprobación
 

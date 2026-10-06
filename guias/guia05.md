@@ -90,12 +90,12 @@ en los atributos tal como usted los escaló.
 
 **Bagging.** Con $B$ modelos independientes de varianza $\sigma^2$:
 
-$$\operatorname{Var}\!\left(\frac{1}{B}\sum_{b=1}^{B}\hat h_b\right)=\frac{\sigma^2}{B}$$
+$$\mathrm{Var}\!\left(\frac{1}{B}\sum_{b=1}^{B}\hat h_b\right)=\frac{\sigma^2}{B}$$
 
 **Bosques aleatorios.** Los modelos no son independientes. Con
 correlación $\rho$:
 
-$$\operatorname{Var}\!\left(\frac{1}{B}\sum_b \hat h_b\right)=\rho\,\sigma^2+\frac{1-\rho}{B}\,\sigma^2\;\xrightarrow[B\to\infty]{}\;\rho\,\sigma^2$$
+$$\mathrm{Var}\!\left(\frac{1}{B}\sum_b \hat h_b\right)=\rho\,\sigma^2+\frac{1-\rho}{B}\,\sigma^2\;\xrightarrow[B\to\infty]{}\;\rho\,\sigma^2$$
 
 **Esta es la fórmula que conviene recordar.** Dice que añadir árboles no
 baja de $\rho\sigma^2$: para mejorar hay que reducir $\rho$, y eso es lo
